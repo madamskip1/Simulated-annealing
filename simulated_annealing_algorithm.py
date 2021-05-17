@@ -18,6 +18,7 @@ class SimulatedAnnealingAlgorithm;
         _tabu_max_length = tabu_max_length
         _neighbour_radius = 0
         _tabu_radius = 0 
+        _is_maximize_function = false # jeśli fałsz to minimalizujemy, jak true to maksymalizujemy
     
     def go(self, temp):
         new_point = self._generate_neighbour()
@@ -29,9 +30,12 @@ class SimulatedAnnealingAlgorithm;
             
         self._tabu.append(self._point)
         
+        self._try_delete_from_tabu()
+        
+        
+    def _try_delete_from_tabu(self):
         if (len(self._tabu) > self._tabu_max_length):
             self._tabu.pop(0)
-        
         
     def _generate_neighbour(self):
     # funkcja generuje kolejnych sąsiadów, aż znajdzie takiego, który może być użyty
@@ -62,7 +66,9 @@ class SimulatedAnnealingAlgorithm;
         
     
     def _can_be_new_point(self, score, temp):
-        if (score > self._score):
+        if (self._is_maximize_function and score > self._score):
+            return true
+        elif (not self._is_maximize_function and score < self._score):
             return true
         elif (random.uniform(0, 1) < self._calc_pa(temp, score)):
             return true
