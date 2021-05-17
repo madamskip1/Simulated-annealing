@@ -6,12 +6,18 @@ import math
 
 class SimulatedAnnealingAlgorithm;
 
-    def __init__(self, tabu_max_length):
+    def __init__(self):
+        #trzeba poustawiac wybrane parametry
+        # najlepiej w konstruktorze lub przez metode
+        # wtedy łatwiej będzie testować
+        # TO DO
         _point = None
         _score_func = None
         _score = 0
         _tabu = []
         _tabu_max_length = tabu_max_length
+        _neighbour_radius = 0
+        _tabu_radius = 0 
     
     def go(self, temp):
         new_point = self._generate_neighbour()
@@ -28,12 +34,32 @@ class SimulatedAnnealingAlgorithm;
         
         
     def _generate_neighbour(self):
-    # ta funkcja bedzie zwracac prawidlowego sasiada
-    # wywola funkcje _random_neighbour
+    # funkcja generuje kolejnych sąsiadów, aż znajdzie takiego, który może być użyty
+        while True:
+            neighbourPoint = self._random_neighbour()
+            
+            if not _check_if_tabu_neighbour(neighbourPoint)
+                return neighbourPoint
     
     def _random_neighbour(self):
-    # ta funkcja będzie zwracać losowego sasiada
-    # wywolywana w _generate_neighbour
+    # funkcja zwraca losowego sąsiada aktualnego punktu
+    # MOŻE TRZEBA ZROBIC INNA
+        dim = len(self._point)
+        neighbourPoint = np.random.uniform(-self._neighbour_radius, self._neighbour_radius, dim)
+        neighbourPoint = neighbourPoint + self._point
+        
+        return neighbourPoint
+        
+    def _check_if_tabu_neighbour(self, point):
+    # funkcja sprawdzajaca czy punkt lezy w sasiedztwie jakiegos punktu w tabu_max_length
+        dim = len(point)
+        for x in range(dim):
+            temp = point[x] - self._point[x]
+            if (temp <= self._tabu_radius)
+                return true
+        
+        return false
+        
     
     def _can_be_new_point(self, score, temp):
         if (score > self._score):
