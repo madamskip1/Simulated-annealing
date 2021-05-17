@@ -2,6 +2,8 @@ import numpy as np
 import random
 import math
 
+# napisać funkcje generacji sąsiadów
+
 class SimulatedAnnealingAlgorithm;
 
     def __init__(self, tabu_max_length):
