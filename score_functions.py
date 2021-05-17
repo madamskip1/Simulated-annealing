@@ -10,5 +10,5 @@ def rastrigin_function(dimArray):
         sumPart += (x ** 2 - 10 * np.cos(2 * np.pi * x))
         
     rastrigin = 10 * len(dimArray) + sumPart
-    
+
     return rastrigin
