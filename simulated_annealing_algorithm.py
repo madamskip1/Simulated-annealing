@@ -2,31 +2,27 @@ import numpy as np
 import random
 import math
 
-TABU_MAX_LENGTH = 10
-# napisać funkcje generacji sąsiadów
 
 class SimulatedAnnealingAlgorithm:
 
-    def __init__(self, score_function, clamp = 0.0):
+    def __init__(self, score_function, clamp, is_maximize, tabu_max_length, neighbour_radius, tabu_radius):
         #trzeba poustawiac wybrane parametry
         # najlepiej w konstruktorze lub przez metode
         # wtedy łatwiej będzie testować
         # TO DO
         self._point = None
         self._score_func = score_function
-        self._score = 0
-        self._clamp = clamp;
+        self._score = -float('inf') if is_maximize else float('inf')
+        self._clamp = clamp
         self._tabu = []
-        self._tabu_max_length = TABU_MAX_LENGTH
-        self._neighbour_radius = 10
-        self._tabu_radius = 3
-        self._is_maximize_function = False # jeśli fałsz to minimalizujemy, jak true to maksymalizujemy
+        self._tabu_max_length = tabu_max_length
+        self._neighbour_radius = neighbour_radius
+        self._tabu_radius = tabu_radius
+        self._is_maximize_function = is_maximize # jeśli fałsz to minimalizujemy, jak true to maksymalizujemy
     
-    def set_start_point(self, point):
-        self._point = point
-        self._score = self._score_func(point)
-        
-        
+    
+    
+    
     def go(self, temperature):
         new_point = self._generate_neighbour()
 
@@ -40,7 +36,16 @@ class SimulatedAnnealingAlgorithm:
         
         self._try_delete_from_tabu()
         
-        return self._score
+        return self._point, self._score
+
+
+
+
+
+    def set_start_point(self, point):
+        self._point = point
+        self._score = self._score_func(point)
+        
     
     def getScore(self):
         return self._score
@@ -49,6 +54,9 @@ class SimulatedAnnealingAlgorithm:
     def _try_delete_from_tabu(self):
         if (len(self._tabu) > self._tabu_max_length):
             self._tabu.pop(0)
+        
+        
+        
         
     def _generate_neighbour(self):
     # funkcja generuje kolejnych sąsiadów, aż znajdzie takiego, który może być użyty
@@ -83,6 +91,9 @@ class SimulatedAnnealingAlgorithm:
         
         return False
         
+        
+        
+        
     
     def _can_be_new_point(self, score, temperature):
         if (self._is_maximize_function and score > self._score):
@@ -95,6 +106,9 @@ class SimulatedAnnealingAlgorithm:
             return False
         
     def _calc_pa(self, temperature, score):
+        if (temperature < 0.00000001):
+            temperature = 0.00000001
+            
         return math.exp(-(abs(score - self._score)) / temperature)
         
         
