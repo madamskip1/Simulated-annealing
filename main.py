@@ -17,7 +17,7 @@ import os
 
 TESTS_PARAMETERS = {
     "repeat": 10,
-    "max_iterations": 1,
+    "max_iterations": 10000,
     "good_radius": 1.0,
     
     
@@ -27,7 +27,8 @@ TESTS_PARAMETERS = {
             "function":rastrigin_function,
             "clamp": 5.0,
             "startPoint": 5.0,
-            "maximize": False
+            "maximize": False,
+            "global_minimum": 0
         }
     },
     "cooling": {
@@ -127,7 +128,7 @@ def test_one_function(score_function_name):
                                                                     tabu_radius,
                                                                     cooling_A_param)
                                                                     
-                                    log.append(algorithm_result)
+                                    log.append(algorithm_result["best"])
                                 
                                 print("Test ", end="")
                                 print(testsCounter, end="/")
@@ -156,7 +157,9 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
     best_iteration = 0
     best_point = None
     temperature = temperature_max
-    
+    result = {}
+    result["points"] = []
+  
     if (is_maximize_function):
         best_score = -float('inf')
     else:
@@ -172,6 +175,8 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
         
         point, score = simulated_annealing.go(temperature) # point później do wykresów się przyda
         
+        result["points"].append(point)
+        
         if (is_better_score(score, best_score, is_maximize_function)):
             best_score = score
             best_iteration = iteration
@@ -180,7 +185,7 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
         if (score <= TESTS_PARAMETERS["good_radius"]):
             break
 
-    result = {"best_point": best_point, "best_score": best_score, "best_score_iteration": best_iteration, "total_iteration": iteration}
+    result["best"] = {"best_point": best_point, "best_score": best_score, "best_score_iteration": best_iteration, "total_iteration": iteration}
 
     return result
     
