@@ -25,9 +25,8 @@ class SimulatedAnnealingAlgorithm:
     
     def go(self, temperature):
         new_point = self._generate_neighbour()
-
         score = self._score_func(new_point)
-    
+
         if (self._can_be_new_point(score, temperature)):
             self._point = new_point
             self._score = score
