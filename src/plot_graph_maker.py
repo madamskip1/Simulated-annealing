@@ -61,8 +61,10 @@ plt.ylim([-axisLim, axisLim])
 
 plt.title(title)
 
-if not os.path.exists("plot_images"):
-    os.makedirs("plot_images")
+dirPlotImages = "../plot_images/"
+
+if not os.path.exists(dirPlotImages):
+    os.makedirs(dirPlotImages)
     
-plt.savefig('plot_images\\' + title + '.png')
+plt.savefig(dirPlotImages + title + '.png')
 plt.show()

@@ -200,9 +200,10 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
     
 def __save_json(file_name, data):
 
-    file_name = "results\\" + file_name
-    if not os.path.exists("results"):
-        os.makedirs("results")
+    dirResults = "../results/"
+    file_name = dirResults + file_name
+    if not os.path.exists(dirResults):
+        os.makedirs(dirResults)
         
     with open(file_name, 'w', encoding='utf-8') as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
