@@ -17,18 +17,20 @@ import os
 
 TESTS_PARAMETERS = {
     "repeat": 10,
-    "max_iterations": 10000,
-    "good_radius": 1.0,
+    "max_iterations": 10000, # musi być dużo więcej 5-10tyś +
+    "good_score": 1.0, # kiedy uznajemy, że wynik jest wystarczający
+                        # dla minimalizacji score <= good_score
+                        # dla maksymalizacji score >= good_score
     
     
     
     "score_functions": {
         "rastrigin": {
             "function":rastrigin_function,
-            "clamp": 5.0,
-            "startPoint": 5.0,
-            "maximize": False,
-            "global_minimum": 0
+            "clamp": 5.12,          # przedzial w ktorym funkcja jest okreslona
+            "startPoint": 5.0,      # punkt startowy (każdy wymiar będzie miał tę wartość - pozwala powtarzać testy z tego samego punktu
+            "maximize": False,      # czy funkcje minimalizujemy czy maksymalizujemy
+            "global_optimum": [0, 0]     # do rysowania grafów. 
         }
     },
     "cooling": {
@@ -38,39 +40,41 @@ TESTS_PARAMETERS = {
         },
         "logarithmic": {
             "function": logarithmic,
-            "a_paramater": [1, 2]
+            "a_paramater": [0.001, 0.0005] # im mniejszy tym temperatura spada wolniej
         },
         "exponential": {
             "function": exponential,
-            "a_paramater": [1, 2]
+            "a_paramater": [0.9, 1/2] # w wykładniczej parametr musi być <1
         },
         "hyperbolic": {
             "function": hyperbolic,
-            "a_paramater": [1, 2]
+            "a_paramater": [0.001, 0.0005] # im mniejszy tym temperatura spada wolniej
         },
     },
-    "dimension": [1],
+    "dimension": [2],
     "tabu_max_length": [0, 1, 5, 10],
-    "temperature_max": [1, 5, 10, 50],
-    "neighbour_radius": [2.0, 5.0],
-    "tabu_radius": [0.5]     # oznacza mnożnik neighbour_radius przy przeszukiwaniu tabu => tabu_radius*neighbour_radius
+    "temperature_init": [0.1, 1, 10, 50],
+    "neighbour_radius": [0.5, 1.0],
+    "tabu_radius": [0.5]     # oznacza mnożnik neighbour_radius przy przeszukiwaniu tabu => tabu_radius*neighbour_radius. Dzięki temu nie będzie kombinacji, że tabu_radius > neighbour_radius
 }
-
-def is_better_score(newScore, score, is_maximize):
-    if (is_maximize):
-        return newScore > newScore
-    else:
-        return newScore < score
-        
         
 def RUN_TEST():
-    score_function_name = "rastrigin" # Tu zmienić nazwe optymalizowanej funkcji 
+    score_function_name = "rastrigin" # Tu ustawiamy jaka funkcja bedzie optymalizowana!!!!!!!!!!!!!!
     
-    result = test_one_function(score_function_name)        
+    result = __test_one_function(score_function_name)        
     __save_json(score_function_name + ".json", result)    
     
+
+
+
+
+
+
+
+
+
         
-def test_one_function(score_function_name):
+def __test_one_function(score_function_name):
     score_function_parameters = TESTS_PARAMETERS["score_functions"][score_function_name]
     score_function = score_function_parameters["function"]
     score_function_clamp = score_function_parameters["clamp"]
@@ -92,7 +96,7 @@ def test_one_function(score_function_name):
             
                 for tabu_max_length in TESTS_PARAMETERS["tabu_max_length"]:
                     
-                    for temperature_max in TESTS_PARAMETERS["temperature_max"]:
+                    for temperature_init in TESTS_PARAMETERS["temperature_init"]:
                     
                         for neighbour_radius in TESTS_PARAMETERS["neighbour_radius"]:
                             
@@ -102,7 +106,7 @@ def test_one_function(score_function_name):
                                 options["cooling_function_name"] = cooling_function_name
                                 options["dimensions"] = dimensions
                                 options["tabu_max_length"] = tabu_max_length
-                                options["temperature_max"] = temperature_max
+                                options["temperature_init"] = temperature_init
                                 options["neighbour_radius"] = neighbour_radius
                                 options["tabu_radius"] = tabu_radius
                                 options["cooling_A_param"] = cooling_A_param
@@ -123,7 +127,7 @@ def test_one_function(score_function_name):
                                                                     cooling_function_name,
                                                                     dimensions,
                                                                     tabu_max_length,
-                                                                    temperature_max,
+                                                                    temperature_init,
                                                                     neighbour_radius,
                                                                     tabu_radius,
                                                                     cooling_A_param)
@@ -137,12 +141,14 @@ def test_one_function(score_function_name):
                                 
                                 testsCounter = testsCounter + 1
                                 
-                                testResult["result"] = __calcResult(log)
+                                testResult["result"] = __calcTestResult(log)
                                 result["tests"].append(testResult)
+                                
+                                __save_json(score_function_name + "_temp.json", result) # zapisanie po każdym teście zabezpiecza przed utratą danych, jeśli któraś kombinacja parametrów się zatnie
                                 
     return result
                 
-def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_max_length, temperature_max, neighbour_radius, tabu_radius, cooling_A_param):
+def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_max_length, temperature_init, neighbour_radius, tabu_radius, cooling_A_param):
     score_function_parameters = TESTS_PARAMETERS["score_functions"][score_function_name]
     score_function = score_function_parameters["function"]
     is_maximize_function = score_function_parameters["maximize"]
@@ -156,7 +162,7 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
     iteration = 0
     best_iteration = 0
     best_point = None
-    temperature = temperature_max
+    temperature = temperature_init
     result = {}
     result["points"] = []
   
@@ -173,16 +179,18 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
         else:
             temperature = cooling_function(temperature, cooling_A_param, iteration)
         
-        point, score = simulated_annealing.go(temperature) # point później do wykresów się przyda
+        point, score = simulated_annealing.go(temperature)
         
         result["points"].append(point)
         
-        if (is_better_score(score, best_score, is_maximize_function)):
+        if (__is_better_score(score, best_score, is_maximize_function)):
             best_score = score
             best_iteration = iteration
             best_point = point
         
-        if (score <= TESTS_PARAMETERS["good_radius"]):
+        if (not is_maximize_function and score <= TESTS_PARAMETERS["good_score"]):
+            break
+        elif (is_maximize_function and score >= TESTS_PARAMETERS["good_score"]):
             break
 
     result["best"] = {"best_point": best_point, "best_score": best_score, "best_score_iteration": best_iteration, "total_iteration": iteration}
@@ -202,18 +210,35 @@ def __save_json(file_name, data):
     print("Zapisano plik: ", end="")
     print(file_name)
 
+
+
+def __is_better_score(newScore, score, is_maximize):
+    if (is_maximize):
+        return newScore > newScore
+    else:
+        return newScore < score
+        
     
-    
-def __calcResult(testResult):
+def __calcTestResult(testResult):
     result = {}
     best_score_log = []
+    total_iteration_log = []
+    best_score_iteration_log = []
+    
     for oneResult in testResult:
         best_score_log.append(oneResult["best_score"])
+        total_iteration_log.append(oneResult["total_iteration"])
+        best_score_iteration_log.append(oneResult["best_score_iteration"])
         
-    result["min"] = np.min(best_score_log)
-    result["max"] = np.max(best_score_log)
-    result["mean"] = np.mean(best_score_log)
+    result["min"] = np.min(best_score_log).item()
+    result["max"] = np.max(best_score_log).item()
+    result["mean"] = np.mean(best_score_log).item()
+    result["best_score_iteration_mean"] = np.mean(best_score_iteration_log).item()
+    result["best_score_iteration_min"] = np.min(best_score_iteration_log).item()
+    result["total_iteration_min"] = np.min(total_iteration_log).item()
+    result["total_iteration_mean"] = np.mean(total_iteration_log).item()
     
+
     return result
     
     
@@ -221,7 +246,7 @@ def __calcResult(testResult):
 def __calcTestsNum(has_cooling_param = False):
     result = len(TESTS_PARAMETERS["dimension"])
     result = result * len(TESTS_PARAMETERS["tabu_max_length"])
-    result = result * len(TESTS_PARAMETERS["temperature_max"])
+    result = result * len(TESTS_PARAMETERS["temperature_init"])
     result = result * len(TESTS_PARAMETERS["neighbour_radius"])
     result = result * len(TESTS_PARAMETERS["tabu_radius"])
     
@@ -234,6 +259,3 @@ def __calcTestsNum(has_cooling_param = False):
     result = result * coolingTests
     
     return result
-    
-   
-   

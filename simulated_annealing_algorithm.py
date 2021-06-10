@@ -2,14 +2,12 @@ import numpy as np
 import random
 import math
 
+MIN_TEMPERATURE = 0.00000001 
+MAX_TABU_TRIES = 50  # zabezpieczenie przed nieskończoną pętlą w generacji sąsiadów, która może wystąpić przy niektórych kombinacjach parametrów, Dzięki temu w skończonej liczbie prób zmienimy punkt
 
 class SimulatedAnnealingAlgorithm:
 
     def __init__(self, score_function, clamp, is_maximize, tabu_max_length, neighbour_radius, tabu_radius):
-        #trzeba poustawiac wybrane parametry
-        # najlepiej w konstruktorze lub przez metode
-        # wtedy łatwiej będzie testować
-        # TO DO
         self._point = None
         self._score_func = score_function
         self._score = -float('inf') if is_maximize else float('inf')
@@ -17,10 +15,8 @@ class SimulatedAnnealingAlgorithm:
         self._tabu = []
         self._tabu_max_length = tabu_max_length
         self._neighbour_radius = neighbour_radius
-        self._tabu_radius = tabu_radius
+        self._tabu_radius =  tabu_radius * self._neighbour_radius # Dzięki temu nie będzie kombinacji, że tabu_radius > neighbour_radius
         self._is_maximize_function = is_maximize # jeśli fałsz to minimalizujemy, jak true to maksymalizujemy
-    
-    
     
     
     def go(self, temperature):
@@ -32,13 +28,9 @@ class SimulatedAnnealingAlgorithm:
             self._score = score
             
         self._tabu.append(self._point)
-        
         self._try_delete_from_tabu()
         
         return self._point, self._score
-
-
-
 
 
     def set_start_point(self, point):
@@ -48,26 +40,31 @@ class SimulatedAnnealingAlgorithm:
     
     def getScore(self):
         return self._score
-        
-    
+
+
+
     def _try_delete_from_tabu(self):
         if (len(self._tabu) > self._tabu_max_length):
             self._tabu.pop(0)
-        
-        
-        
+            
         
     def _generate_neighbour(self):
-    # funkcja generuje kolejnych sąsiadów, aż znajdzie takiego, który może być użyty
+        triesCounter = 1
+        
         while True:
             neighbourPoint = self._random_neighbour()
             
             if not self._check_if_tabu_neighbour(neighbourPoint):
                 return neighbourPoint
+                
+            if (triesCounter >= MAX_TABU_TRIES): # zabezpieczenie przed nieskończoną pętlą, która może wystąpić przy niektórych kombinacjach parametrów, Dzięki temu w skończonej liczbie prób zmienimy punkt
+                triesCounter = 0
+                self._tabu.pop(0)
+                
+            triesCounter = triesCounter + 1
+    
     
     def _random_neighbour(self):
-    # funkcja zwraca losowego sąsiada aktualnego punktu
-    # TRZEBA ZROBIĆ LEPSZĄ !!!!
         dim = len(self._point)
         
         neighbourPoint = np.random.uniform(-self._neighbour_radius, self._neighbour_radius, dim)
@@ -78,20 +75,17 @@ class SimulatedAnnealingAlgorithm:
 
         return neighbourPoint
         
+        
     def _check_if_tabu_neighbour(self, point):
-    # funkcja sprawdzajaca czy punkt lezy w sasiedztwie jakiegos punktu w tab_radius
         dim = len(point)
-
-        for x in range(dim):
-            temp = abs(point[x] - self._point[x])
+        
+        for tabu_member in self._tabu:
+            distance = np.linalg.norm(point - tabu_member)
             
-            if (temp <= self._tabu_radius):
+            if (distance <= self._tabu_radius):
                 return True
         
         return False
-        
-        
-        
         
     
     def _can_be_new_point(self, score, temperature):
@@ -104,10 +98,9 @@ class SimulatedAnnealingAlgorithm:
         else:
             return False
         
+        
     def _calc_pa(self, temperature, score):
-        if (temperature < 0.00000001):
-            temperature = 0.00000001
-            
-        return math.exp(-(abs(score - self._score)) / temperature)
+        if (temperature < MIN_TEMPERATURE):
+            temperature = MIN_TEMPERATURE
         
-        
+        return math.exp(-(abs(score - self._score) / temperature))
