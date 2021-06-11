@@ -174,13 +174,22 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
             
     
     start_point = [score_function_parameters["startPoint"] for i in range(dimensions)]
-    simulated_annealing = SimulatedAnnealingAlgorithm(score_function, score_function_parameters["clamp"], is_maximize_function, tabu_max_length, neighbour_radius, tabu_radius)
+    
+    simulated_annealing = SimulatedAnnealingAlgorithm(score_function,
+                                                    cooling_function, 
+                                                    cooling_A_param, 
+                                                    temperature_init,
+                                                    score_function_parameters["clamp"], 
+                                                    is_maximize_function, 
+                                                    tabu_max_length, 
+                                                    neighbour_radius,
+                                                    tabu_radius)
+                                                    
     simulated_annealing.set_start_point(start_point)
     
     iteration = 0
     best_iteration = 0
     best_point = None
-    temperature = temperature_init
     result = {}
     result["points"] = []
   
@@ -192,12 +201,7 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
     while (iteration < TESTS_PARAMETERS["max_iterations"]):
         iteration += 1
         
-        if (cooling_function_name == "constant"):
-            temperature = cooling_function(temperature)
-        else:
-            temperature = cooling_function(temperature, cooling_A_param, iteration)
-        
-        point, score = simulated_annealing.go(temperature)
+        point, score = simulated_annealing.run_one_iteration(iteration)
         
         result["points"].append(point)
         
