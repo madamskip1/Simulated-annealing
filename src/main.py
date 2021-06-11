@@ -3,6 +3,7 @@ from temperature_algorithms import *
 from score_functions import *
 import json
 import os
+import numpy as np
 
 # ################################################# #
 #                                                   #        
@@ -18,7 +19,7 @@ import os
 TESTS_PARAMETERS = {
     "repeat": 10,
     "max_iterations": 10000, # musi być dużo więcej 5-10tyś +
-    "good_score": 1.0, # kiedy uznajemy, że wynik jest wystarczający
+    "good_score": 0.0, # kiedy uznajemy, że wynik jest wystarczający
                         # dla minimalizacji score <= good_score
                         # dla maksymalizacji score >= good_score
     
@@ -31,6 +32,30 @@ TESTS_PARAMETERS = {
             "startPoint": 5.0,      # punkt startowy (każdy wymiar będzie miał tę wartość - pozwala powtarzać testy z tego samego punktu
             "maximize": False,      # czy funkcje minimalizujemy czy maksymalizujemy
             "global_optimum": [0, 0]     # do rysowania grafów. 
+        },
+
+        "rosenbrock": {
+            "function":rosenbrock_function,
+            "clamp": 100.0,          # przedzial w ktorym funkcja jest okreslona
+            "startPoint": 99.0,      # punkt startowy (każdy wymiar będzie miał tę wartość - pozwala powtarzać testy z tego samego punktu
+            "maximize": False,      # czy funkcje minimalizujemy czy maksymalizujemy
+            "global_optimum": [0, 0]     # do rysowania grafów. 
+        },
+
+        "ackley": {
+            "function":ackley_function,
+            "clamp": 5.0,          # przedzial w ktorym funkcja jest okreslona
+            "startPoint": 4.0,      # punkt startowy (każdy wymiar będzie miał tę wartość - pozwala powtarzać testy z tego samego punktu
+            "maximize": False,      # czy funkcje minimalizujemy czy maksymalizujemy
+            "global_optimum": [0, 0]     # do rysowania grafów. 
+        },
+
+        "levi_n13": {
+            "function":levi_n13_function,
+            "clamp": 10.0,          # przedzial w ktorym funkcja jest okreslona
+            "startPoint": 9.0,      # punkt startowy (każdy wymiar będzie miał tę wartość - pozwala powtarzać testy z tego samego punktu
+            "maximize": False,      # czy funkcje minimalizujemy czy maksymalizujemy
+            "global_optimum": [1, 1]     # do rysowania grafów. 
         }
     },
     "cooling": {
@@ -40,37 +65,30 @@ TESTS_PARAMETERS = {
         },
         "logarithmic": {
             "function": logarithmic,
-            "a_paramater": [0.001, 0.0005] # im mniejszy tym temperatura spada wolniej
+            "a_paramater": [0.01, 0.001] # im mniejszy tym temperatura spada wolniej
         },
         "exponential": {
             "function": exponential,
-            "a_paramater": [0.9, 1/2] # w wykładniczej parametr musi być <1
+            "a_paramater": [0.5, 0.1] # w wykładniczej parametr musi być <1
         },
         "hyperbolic": {
             "function": hyperbolic,
-            "a_paramater": [0.001, 0.0005] # im mniejszy tym temperatura spada wolniej
+            "a_paramater": [0.01, 0.001] # im mniejszy tym temperatura spada wolniej
         },
     },
     "dimension": [2],
-    "tabu_max_length": [0, 1, 5, 10],
-    "temperature_init": [0.1, 1, 10, 50],
-    "neighbour_radius": [0.5, 1.0],
-    "tabu_radius": [0.5]     # oznacza mnożnik neighbour_radius przy przeszukiwaniu tabu => tabu_radius*neighbour_radius. Dzięki temu nie będzie kombinacji, że tabu_radius > neighbour_radius
+    "tabu_max_length": [0, 10, 50],
+    "temperature_init": [1, 100, 10000],
+    "neighbour_radius": [0.2, 2.0, 10.0], # maly wzgledem zakresu, normalny wedlug zakresu np dla 5 - 1, caly zakres
+    "tabu_radius": [0.001]     # oznacza mnożnik neighbour_radius przy przeszukiwaniu tabu => tabu_radius*neighbour_radius. Dzięki temu nie będzie kombinacji, że tabu_radius > neighbour_radius
 }
         
 def RUN_TEST():
-    score_function_name = "rastrigin" # Tu ustawiamy jaka funkcja bedzie optymalizowana!!!!!!!!!!!!!!
+    score_function_name = "levi_n13" # Tu ustawiamy jaka funkcja bedzie optymalizowana!!!!!!!!!!!!!!
     
     result = __test_one_function(score_function_name)        
     __save_json(score_function_name + ".json", result)    
     
-
-
-
-
-
-
-
 
 
         
