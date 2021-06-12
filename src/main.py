@@ -192,6 +192,7 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
     best_point = None
     result = {}
     result["points"] = []
+    result["scores"] = []
   
     if (is_maximize_function):
         best_score = -float('inf')
@@ -204,6 +205,7 @@ def run_algorithm(score_function_name, cooling_function_name, dimensions, tabu_m
         point, score = simulated_annealing.run_one_iteration(iteration)
         
         result["points"].append(point)
+        result["scores"].append(score)
         
         if (__is_better_score(score, best_score, is_maximize_function)):
             best_score = score

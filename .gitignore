@@ -3,6 +3,8 @@ results/
 results/*
 plot_images/
 plot_images/*
+csv_results/
+csv_results/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
