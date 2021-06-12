@@ -5,6 +5,10 @@ plot_images/
 plot_images/*
 csv_results/
 csv_results/*
+point_plot/
+point_plot/*
+score_plot/
+score_plot/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
