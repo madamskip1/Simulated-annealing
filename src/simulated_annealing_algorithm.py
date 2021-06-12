@@ -12,7 +12,8 @@ class SimulatedAnnealingAlgorithm:
         self._score_func = score_function
         self._cooling_function = cooling_function
         self._cooling_param = cooling_param
-        self._temperature = temperature_init
+        self._temperature_init = temperature_init
+        self._temperature = self._temperature_init
         self._score = -float('inf') if is_maximize else float('inf')
         self._clamp = clamp
         self._tabu = []
@@ -46,7 +47,7 @@ class SimulatedAnnealingAlgorithm:
 
 
     def _calc_temperature(self, iteration):
-        self._temperature = self._cooling_function(self._temperature, self._cooling_param, iteration)
+        self._temperature = self._cooling_function(self._temperature_init, self._cooling_param, iteration)
         if (self._temperature < MIN_TEMPERATURE):
             self._temperature = MIN_TEMPERATURE
 

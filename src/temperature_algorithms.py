@@ -1,18 +1,18 @@
 import numpy as np
 
 
-def constant(temperature, a, i):
-    return temperature
+def constant(Temp_0, a, i):
+    return Temp_0
 
 
-def logarithmic(temperature, a, i):
-    return (temperature / (1 + a*np.log(1 + i)))
+def logarithmic(Temp_0, a, i):
+    return (Temp_0 / (1 + a*np.log(1 + i)))
 
 
-def exponential(temperature, a, i):
-    return (temperature * a ** i)
+def exponential(Temp_0, a, i):
+    return (Temp_0 * a ** i)
 
 
 
-def hyperbolic(temperature, a, i):
-    return (temperature / (1 + a * i))
+def hyperbolic(Temp_0, a, i):
+    return (Temp_0 / (1 + a * i))
