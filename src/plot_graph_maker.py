@@ -2,7 +2,7 @@ from main import run_algorithm, TESTS_PARAMETERS
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-
+import json
 
 # #################################
 # USTAWIENIA
@@ -11,32 +11,193 @@ import os
 params = [
 
     {
+        "score_function_name": "rastrigin",
+        "cooling_function_name": "logarithmic",
+        "tabu_max_length": 50,
+        "temperature_init": 100,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.001,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "rastrigin",
+        "cooling_function_name": "exponential",
+        "tabu_max_length": 0,
+        "temperature_init": 10000,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.5,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "rastrigin",
+        "cooling_function_name": "hyperbolic",
+        "tabu_max_length": 50,
+        "temperature_init": 100,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.001,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "rastrigin",
+        "cooling_function_name": "constant",
+        "tabu_max_length": 0,
+        "temperature_init": 1,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 1,
+
+        "plot_num": -1,
+    },
+
+    {
+        "score_function_name": "rosenbrock",
+        "cooling_function_name": "logarithmic",
+        "tabu_max_length": 50,
+        "temperature_init": 1,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.001,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "rosenbrock",
+        "cooling_function_name": "exponential",
+        "tabu_max_length": 10,
+        "temperature_init": 1000,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.5,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "rosenbrock",
+        "cooling_function_name": "hyperbolic",
+        "tabu_max_length": 0,
+        "temperature_init": 100,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.01,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "rosenbrock",
+        "cooling_function_name": "constant",
+        "tabu_max_length": 10,
+        "temperature_init": 1,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 1,
+
+        "plot_num": -1,
+    },
+
+    {
+        "score_function_name": "ackley",
+        "cooling_function_name": "logarithmic",
+        "tabu_max_length": 10,
+        "temperature_init": 1,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.01,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "ackley",
+        "cooling_function_name": "exponential",
+        "tabu_max_length": 0,
+        "temperature_init": 10000,
+        "neighbour_radius": 1.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.5,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "ackley",
+        "cooling_function_name": "hyperbolic",
+        "tabu_max_length": 10,
+        "temperature_init": 10000,
+        "neighbour_radius": 1,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.001,
+
+        "plot_num": -1,
+    },
+    {
         "score_function_name": "ackley",
         "cooling_function_name": "constant",
-        "cooling_A_param": 1,
         "tabu_max_length": 0,
         "temperature_init": 1,
         "neighbour_radius": 0.1,
         "tabu_radius": 0.001,
-        "plot_num": -1,
-    },
-        {
-        "score_function_name": "ackley",
-        "cooling_function_name": "logarithmic",
         "cooling_A_param": 1,
-        "tabu_max_length": 100,
-        "temperature_init": 1,
-        "neighbour_radius": 0.1,
-        "tabu_radius": 0.001,
+
         "plot_num": -1,
     },
+
+    {
+        "score_function_name": "levi_n13",
+        "cooling_function_name": "logarithmic",
+        "tabu_max_length": 50,
+        "temperature_init": 10000,
+        "neighbour_radius": 2.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.01,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "levi_n13",
+        "cooling_function_name": "exponential",
+        "tabu_max_length": 10,
+        "temperature_init": 1,
+        "neighbour_radius": 2.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.1,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "levi_n13",
+        "cooling_function_name": "hyperbolic",
+        "tabu_max_length": 50,
+        "temperature_init": 10000,
+        "neighbour_radius": 2.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 0.001,
+
+        "plot_num": -1,
+    },
+    {
+        "score_function_name": "levi_n13",
+        "cooling_function_name": "constant",
+        "tabu_max_length": 50,
+        "temperature_init": 1,
+        "neighbour_radius": 2.0,
+        "tabu_radius": 0.001,
+        "cooling_A_param": 1,
+
+        "plot_num": -1,
+    }
+
+
 ]
 
 # KONIEC USTAWIEN
 # ###############################
 
 
-
+csv_step = 5 # co ktora iteracja ma byc zapisywana
 
 
 
@@ -68,6 +229,8 @@ for testId in range(len(params)):
 
     test = run_algorithm(score_function_name, cooling_function_name, 2, tabu_max_length, temperature_init, neighbour_radius, tabu_radius, cooling_A_param)
 
+
+
     x = []
     y = []
 
@@ -91,6 +254,18 @@ for testId in range(len(params)):
     plt.title(title)
 
     dirPlotImages = "../plot_images/"
+
+    csvResult = []
+
+    for i in range(0, len(test["scores"]), csv_step):
+        csvResult.append([i, test["scores"][i]])
+
+    dirCSV = "../csv_results/"
+
+    if not os.path.exists(dirCSV):
+        os.makedirs(dirCSV)
+
+    np.savetxt(dirCSV + title + ".csv", csvResult, delimiter=',', header="point_num,score", comments='')
 
     if not os.path.exists(dirPlotImages):
         os.makedirs(dirPlotImages)
