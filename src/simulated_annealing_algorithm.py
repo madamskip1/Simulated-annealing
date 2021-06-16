@@ -8,24 +8,28 @@ MAX_TABU_TRIES = 50  # zabezpieczenie przed nieskończoną pętlą w generacji s
 class SimulatedAnnealingAlgorithm:
 
     def __init__(self, score_function, cooling_function, cooling_param, temperature_init, clamp, is_maximize, tabu_max_length, neighbour_radius, tabu_radius):
-        self._point = None
         self._score_func = score_function
         self._cooling_function = cooling_function
         self._cooling_param = cooling_param
         self._temperature_init = temperature_init
         self._temperature = self._temperature_init
-        self._score = -float('inf') if is_maximize else float('inf')
         self._clamp = clamp
-        self._tabu = []
         self._tabu_max_length = tabu_max_length
         self._neighbour_radius = neighbour_radius
         self._tabu_radius =  tabu_radius * self._neighbour_radius # Dzięki temu nie będzie kombinacji, że tabu_radius > neighbour_radius
         self._is_maximize_function = is_maximize # jeśli fałsz to minimalizujemy, jak true to maksymalizujemy
-    
-    
+        
+        self._point = None
+        self._score = -float('inf') if is_maximize else float('inf')
+        self._tabu = []
+        self._log = []
+
+
     def run_one_iteration(self, iteration):
         new_point = self._generate_neighbour()
+        self._log.append(new_point)
         score = self._score_func(new_point)
+        
 
         self._calc_temperature(iteration)
         
